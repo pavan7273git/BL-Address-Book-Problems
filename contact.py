@@ -11,4 +11,4 @@ class Contact:
 
 
     def __str__(self):
-        return f"{self.first_name} {self.last_name} | {self.phone_number} | {self.email_id} | {self.city} | {self.state} | {self.zip_code}"
+        return f"{self.first_name} {self.last_name} | {self.phone_number} | {self.address} | {self.mail} | {self.city} | {self.state} | {self.zip_code}"
