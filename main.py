@@ -8,9 +8,14 @@ address_book_system = AddressBookMain()
 @validation_wrapper
 def add_contact_to_book(address_book, contact_data):
     """ Adds a validated contact to the selected address book. """
-    contact_data["first_name"] = contact_data["first_name"].capitalize()
-    contact_data["last_name"] = contact_data["last_name"].capitalize()
+    first_name= contact_data["first_name"].capitalize()
+    last_name = contact_data["last_name"].capitalize()
     
+    # Check if the contact already exists
+    if address_book.is_duplicate(first_name, last_name):
+        print("\n Duplicate Entry: A contact with this name already exists in the Address Book!")
+        return
+
     contact = Contact(**contact_data)  
     address_book.add_contact(contact)  
     print("\n Contact added successfully!")

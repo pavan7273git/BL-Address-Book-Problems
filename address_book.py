@@ -8,6 +8,12 @@ class AddressBook:
         """Adds a new contact to the address book."""
         self.contacts.append(contact)
 
+
+    def is_duplicate(self, first_name, last_name):
+        """Checks if a contact with the same name already exists."""
+        return any(contact.first_name == first_name and contact.last_name == last_name for contact in self.contacts)
+
+
     def view_contacts(self):
         """Displays all contacts in the address book."""
         if not self.contacts:
