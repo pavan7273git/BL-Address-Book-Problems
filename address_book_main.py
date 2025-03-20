@@ -36,34 +36,29 @@ class AddressBookMain:
 
 
 class SearchByCity(AddressBookMain):
-    def __init__(self, city_name):
-        self.city_name = city_name
-
-    def search(self, address_book_system):
-        """Searches for contacts in all address books by city name and stores them in a dictionary."""
-        results = {}
+    def search(self, address_book_system, city_name):
+        """Searches contacts by city name and returns a dictionary."""
+        city_dict = {}
         for book_name, address_book in address_book_system.address_books.items():
             for contact in address_book.contacts:
-                if contact.city.lower() == self.city_name.lower():
-                    if contact.city not in results:
-                        results[contact.city] = []  # Initialize list for this city
-                    results[contact.city].append((contact, book_name))  # Add contact and address book name
-        return results
-
+                if contact.city.lower() == city_name.lower():
+                    if city_name not in city_dict:
+                        city_dict[city_name] = []
+                    city_dict[city_name].append((contact, book_name))
+        return city_dict  
+        
 
 class SearchByState(AddressBookMain):
-    def __init__(self, state_name):
-        self.state_name = state_name
-
-    def search(self, address_book_system):
-        """Searches for contacts in all address books by state name and stores them in a dictionary."""
-        results = {}
+    def search(self, address_book_system, state_name):
+        """Searches contacts by state name and returns a dictionary."""
+        state_dict = {}
         for book_name, address_book in address_book_system.address_books.items():
             for contact in address_book.contacts:
-                if contact.state.lower() == self.state_name.lower():
-                    if contact.state not in results:
-                        results[contact.state] = []  # Initialize list for this state
-                    results[contact.state].append((contact, book_name))  # Add contact and address book name
-        return results
+                if contact.state.lower() == state_name.lower():
+                    if state_name not in state_dict:
+                        state_dict[state_name] = []
+                    state_dict[state_name].append((contact, book_name))
+        return state_dict  
+
 
 

@@ -67,32 +67,79 @@ def edit_contact(address_book):
     print("\nContact updated successfully!")
 
 
+# def print_search_results(results, search_type):
+#     """Prints search results with the count of contacts per location."""
+#     if not results:
+#         print(f"\nNo contacts found in the given {search_type}.")
+#         return
+
+#     print(f"\nSearch Results for {search_type}:")
+#     for location, contacts in results.items():
+#         print(f"\nLocation: {location} ({len(contacts)} contacts found)")
+#         for contact, book_name in contacts:
+#             print(f" - {contact.first_name} {contact.last_name} (Found in Address Book: {book_name})")
+
+
 def search_contact():
-    """Allows the user to search for a contact by city or state and displays results as a dictionary."""
+    """Searches for contacts by city or state and prints results with count."""
     print("\n1. Search by City")
     print("2. Search by State")
+
     choice = input("Choose an option: ").strip()
 
     if choice == "1":
-        city_name = input("Enter City Name to search: ").strip()
-        search_instance = SearchByCity(city_name)
-        results = search_instance.search(address_book_system)
-    elif choice == "2":
-        state_name = input("Enter State Name to search: ").strip()
-        search_instance = SearchByState(state_name)
-        results = search_instance.search(address_book_system)
-    else:
-        print("Invalid choice.")
-        return
-    
-    if results:
-        print("\nSearch Results:")
-        for location, contacts in results.items():
-            print(f"\nLocation: {location}")
+        city_name = input("Enter City Name to search: ").strip().lower()
+        search_city = SearchByCity()
+        city_dict = search_city.search(address_book_system, city_name)  # Pass city_name
+
+        if city_dict:
+            contacts = city_dict[city_name]
+            print(f"\nSearch Results:")
+            print(f"Location: {city_name.capitalize()}  (Total Contacts: {len(contacts)})\n")  # Corrected count
+            
             for contact, book_name in contacts:
-                print(f"{contact} (Found in Address Book: {book_name})")
+                print(f"First Name: {contact.first_name}")
+                print(f"Last Name: {contact.last_name}")
+                print(f"Address: {contact.address}")
+                print(f"City: {contact.city}")
+                print(f"State: {contact.state}")
+                print(f"Zip Code: {contact.zip_code}")
+                print(f"Phone Number: {contact.phone_number}")
+                print(f"Email: {contact.email}")
+                print(f"(Found in Address Book: {book_name})")
+                print("-" * 40) 
+
+        else:
+            print("\nNo contacts found in this city.")
+
+    elif choice == "2":
+        state_name = input("Enter State Name to search: ").strip().lower()
+        search_state = SearchByState()
+        state_dict = search_state.search(address_book_system, state_name)  # Pass state_name
+
+        if state_dict:
+            contacts = state_dict[state_name]
+            print(f"\nSearch Results:")
+            print(f"Location: {state_name.capitalize()}  (Total Contacts: {len(contacts)})\n")  # count
+            
+            for contact, book_name in contacts:
+                print(f"First Name: {contact.first_name}")
+                print(f"Last Name: {contact.last_name}")
+                print(f"Address: {contact.address}")
+                print(f"City: {contact.city}")
+                print(f"State: {contact.state}")
+                print(f"Zip Code: {contact.zip_code}")
+                print(f"Phone Number: {contact.phone_number}")
+                print(f"Email: {contact.email}")
+                print(f"(Found in Address Book: {book_name})")
+                print("-" * 40)  
+
+        else:
+            print("\nNo contacts found in this state.")
+
     else:
-        print("\nNo contacts found in the given location.")
+        print("Invalid choice! Returning to main menu.")
+
 
 
 
