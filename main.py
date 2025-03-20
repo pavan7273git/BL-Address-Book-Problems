@@ -67,30 +67,43 @@ def edit_contact(address_book):
     print("\nContact updated successfully!")
 
 
-# def print_search_results(results, search_type):
-#     """Prints search results with the count of contacts per location."""
-#     if not results:
-#         print(f"\nNo contacts found in the given {search_type}.")
-#         return
-
-#     print(f"\nSearch Results for {search_type}:")
-#     for location, contacts in results.items():
-#         print(f"\nLocation: {location} ({len(contacts)} contacts found)")
-#         for contact, book_name in contacts:
-#             print(f" - {contact.first_name} {contact.last_name} (Found in Address Book: {book_name})")
 
 def sort_contacts(address_book):
-    """Sorts and displays contacts alphabetically by first name."""
-    contacts = address_book.contacts  # Directly use the list
-
-    if not contacts:
+    """Sorts and displays contacts based on user-selected criteria."""
+    if not address_book.contacts:
         print("\nNo contacts available to sort!")
         return
 
-    # Sorting contacts by first name (case insensitive)
-    sorted_contacts = sorted(contacts, key=lambda c: c.first_name.lower())
+    print("\nSort Contacts By:")
+    print("1. First Name")
+    print("2. City")
+    print("3. State")
+    print("4. ZIP Code")
 
-    print("\nSorted Contacts (Alphabetically by First Name):\n")
+    choice = input("Choose an option: ").strip()
+
+    # Define sorting criteria based on user choice
+    if choice == "1":
+        key_func = lambda c: c.first_name.lower()
+        sort_type = "First Name"
+    elif choice == "2":
+        key_func = lambda c: c.city.lower()
+        sort_type = "City"
+    elif choice == "3":
+        key_func = lambda c: c.state.lower()
+        sort_type = "State"
+    elif choice == "4":
+        key_func = lambda c: c.zip_code
+        sort_type = "ZIP Code"
+    else:
+        print("Invalid choice! Returning to main menu.")
+        return
+
+    # Sorting contacts based on the chosen key
+    sorted_contacts = sorted(address_book.contacts, key=key_func)
+
+    # Display sorted contacts
+    print(f"\nSorted Contacts (By {sort_type}):\n")
     for contact in sorted_contacts:
         print(f"First Name: {contact.first_name}")
         print(f"Last Name: {contact.last_name}")
@@ -100,7 +113,8 @@ def sort_contacts(address_book):
         print(f"Zip Code: {contact.zip_code}")
         print(f"Phone Number: {contact.phone_number}")
         print(f"Email: {contact.email}")
-        print("-" * 40)  
+        print("-" * 40)  # Separator for readability
+  
 
 
 def search_contact():
