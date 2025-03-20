@@ -1,6 +1,8 @@
 from address_book_main import AddressBookMain
 from validate import validation_wrapper, validate_data
 from contact import Contact
+from address_book_main import SearchByCity, SearchByState
+
 
 # Initialize Address Book system
 address_book_system = AddressBookMain()
@@ -64,6 +66,33 @@ def edit_contact(address_book):
     contact.update(validated_data)  # Update contact details
     print("\nContact updated successfully!")
 
+
+def search_contact():
+    """Allows the user to search for a contact by city or state."""
+    print("\n1. Search by City")
+    print("2. Search by State")
+    choice = input("Choose an option: ").strip()
+
+    if choice == "1":
+        city_name = input("Enter City Name to search: ").strip()
+        search_instance = SearchByCity(city_name)  # Create an instance with city_name
+        results = search_instance.search(address_book_system)  # Call instance method
+    elif choice == "2":
+        state_name = input("Enter State Name to search: ").strip()
+        search_instance = SearchByState(state_name)  # Create an instance with state_name
+        results = search_instance.search(address_book_system)  # Call instance method
+    else:
+        print("Invalid choice.")
+        return
+    
+    if results:
+        print("\nSearch Results:")
+        for contact, book_name in results:
+            print(f"{contact} (Found in Address Book: {book_name})")
+    else:
+        print("\nNo contacts found.")
+
+
 def manage_address_book():
     """Handles address book operations."""
     while True:
@@ -72,7 +101,8 @@ def manage_address_book():
         print("2. Select Address Book")
         print("3. Display Address Books")
         print("4. Delete Address Book")
-        print("5. Exit")
+        print("5. Search Contact")
+        print("6. Exit")
 
         choice = input("Choose an option: ").strip()
 
@@ -85,7 +115,7 @@ def manage_address_book():
             address_book = address_book_system.get_address_book(book_name)
 
             if address_book is None:
-                print(" Address Book not found!")
+                print("Address Book not found")
                 continue
             
             while True:
@@ -109,16 +139,16 @@ def manage_address_book():
                     edit_contact(address_book)
 
                 elif sub_choice == "4":
-                    first_name = input("Enter First Name of contact to delete: ").strip().lower()
-                    last_name = input("Enter Last Name of contact to delete: ").strip().lower()
+                    first_name = input("Enter First Name of contact to delete: ").strip()
+                    last_name = input("Enter Last Name of contact to delete: ").strip()
                     address_book.delete_contact(first_name, last_name)
 
                 elif sub_choice == "5":
-                    print(f" Exiting '{book_name}' Address Book.")
+                    print(f"Exiting '{book_name}' Address Book")
                     break
                 
                 else:
-                    print(" Invalid choice, please select again.")
+                    print("Invalid choice, please select again")
 
         elif choice == "3":
             address_book_system.display_address_books()
@@ -128,11 +158,14 @@ def manage_address_book():
             address_book_system.delete_address_book(book_name)
 
         elif choice == "5":
-            print(" Exiting Address Book System. Goodbye!")
+            search_contact()
+
+        elif choice == "6":
+            print("Exiting Address Book System. Goodbye")
             break
 
         else:
-            print("Invalid choice, please select again.")
+            print("Invalid choice, please select again")
 
 if __name__ == "__main__":
     manage_address_book()

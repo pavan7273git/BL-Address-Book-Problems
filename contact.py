@@ -16,5 +16,5 @@ class Contact:
 
     def __str__(self):
         """Return a string representation of the contact."""
-        return (f"First Name: {self.first_name}\n Last Name: {self.last_name}\n Address: {self.address}\nCity: {self.city}\n State: {self.state}\n "
-                f"Zip Code: {self.zip_code}\n Phone Number: {self.phone_number}\nEmail: {self.email}\n")
+        return (f"First Name: {self.first_name}\n Last Name: {self.last_name}\n Address: {self.address}\n City: {self.city}\n State: {self.state}\n "
+                f"Zip Code: {self.zip_code}\n Phone Number: {self.phone_number}\n Email: {self.email}\n")
