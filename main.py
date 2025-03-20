@@ -68,29 +68,32 @@ def edit_contact(address_book):
 
 
 def search_contact():
-    """Allows the user to search for a contact by city or state."""
+    """Allows the user to search for a contact by city or state and displays results as a dictionary."""
     print("\n1. Search by City")
     print("2. Search by State")
     choice = input("Choose an option: ").strip()
 
     if choice == "1":
         city_name = input("Enter City Name to search: ").strip()
-        search_instance = SearchByCity(city_name)  # Create an instance with city_name
-        results = search_instance.search(address_book_system)  # Call instance method
+        search_instance = SearchByCity(city_name)
+        results = search_instance.search(address_book_system)
     elif choice == "2":
         state_name = input("Enter State Name to search: ").strip()
-        search_instance = SearchByState(state_name)  # Create an instance with state_name
-        results = search_instance.search(address_book_system)  # Call instance method
+        search_instance = SearchByState(state_name)
+        results = search_instance.search(address_book_system)
     else:
         print("Invalid choice.")
         return
     
     if results:
         print("\nSearch Results:")
-        for contact, book_name in results:
-            print(f"{contact} (Found in Address Book: {book_name})")
+        for location, contacts in results.items():
+            print(f"\nLocation: {location}")
+            for contact, book_name in contacts:
+                print(f"{contact} (Found in Address Book: {book_name})")
     else:
-        print("\nNo contacts found.")
+        print("\nNo contacts found in the given location.")
+
 
 
 def manage_address_book():

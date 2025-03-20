@@ -40,24 +40,30 @@ class SearchByCity(AddressBookMain):
         self.city_name = city_name
 
     def search(self, address_book_system):
-        """Searches for contacts in all address books by city name."""
-        results = []
+        """Searches for contacts in all address books by city name and stores them in a dictionary."""
+        results = {}
         for book_name, address_book in address_book_system.address_books.items():
             for contact in address_book.contacts:
                 if contact.city.lower() == self.city_name.lower():
-                    results.append((contact, book_name))
+                    if contact.city not in results:
+                        results[contact.city] = []  # Initialize list for this city
+                    results[contact.city].append((contact, book_name))  # Add contact and address book name
         return results
+
 
 class SearchByState(AddressBookMain):
     def __init__(self, state_name):
         self.state_name = state_name
 
     def search(self, address_book_system):
-        """Searches for contacts in all address books by state name."""
-        results = []
+        """Searches for contacts in all address books by state name and stores them in a dictionary."""
+        results = {}
         for book_name, address_book in address_book_system.address_books.items():
             for contact in address_book.contacts:
                 if contact.state.lower() == self.state_name.lower():
-                    results.append((contact, book_name))
+                    if contact.state not in results:
+                        results[contact.state] = []  # Initialize list for this state
+                    results[contact.state].append((contact, book_name))  # Add contact and address book name
         return results
+
 
