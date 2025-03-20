@@ -1,112 +1,133 @@
-from address_book import AddressBookMain  # Import AddressBookMain class
-from validate import validate_data  # Import validation functions
-from contact import Contact  # Import Contact class
+from address_book_main import AddressBookMain
+from validate import validation_wrapper, validate_data
+from contact import Contact
 
-# Take address book name from user
-address_book_name = input("Enter the name of your Address Book: ").strip()
-address_book = AddressBookMain(address_book_name)  # Initialize with user-defined name
+# Initialize Address Book system
+address_book_system = AddressBookMain()
 
-def add_contact():
-    """ Collects user input and adds a contact after validation. """
-    contact_data = {
-        "first_name": input("Enter First Name (Starts with a capital letter, min 3 chars): ").strip(),
-        "last_name": input("Enter Last Name (Starts with a capital letter, min 3 chars): ").strip(),
+@validation_wrapper
+def add_contact_to_book(address_book, contact_data):
+    """ Adds a validated contact to the selected address book. """
+    contact_data["first_name"] = contact_data["first_name"].capitalize()
+    contact_data["last_name"] = contact_data["last_name"].capitalize()
+    
+    contact = Contact(**contact_data)  
+    address_book.add_contact(contact)  
+    print("\n Contact added successfully!")
+
+def get_contact_input():
+    """Collects user input for contact details with trimmed spaces."""
+    return {
+        "first_name": input("Enter First Name: ").strip(),
+        "last_name": input("Enter Last Name: ").strip(),
         "address": input("Enter Address: ").strip(),
         "city": input("Enter City: ").strip(),
         "state": input("Enter State: ").strip(),
-        "zip_code": input("Enter ZIP Code (5-6 digits): ").strip(),
-        "phone_number": input("Enter Phone Number (10 digits): ").strip(),
-        "mail": input("Enter Email: ").strip()
+        "zip_code": input("Enter ZIP Code: ").strip(),
+        "phone_number": input("Enter Phone Number: ").strip(),
+        "email": input("Enter Email: ").strip()
     }
 
-    validated_data = validate_data(contact_data)
-    if any(value is False for value in validated_data.values()):
-        print("\nValidation failed! Contact not added.")
+def edit_contact(address_book):
+    """Edits an existing contact in the address book."""
+    first_name = input("Enter First Name of the contact to edit: ").strip().lower()
+    last_name = input("Enter Last Name of the contact to edit: ").strip().lower()
+    
+    contact = address_book.get_contact(first_name, last_name)
+    if not contact:
+        print("\n Contact not found!")
         return
     
-    contact = Contact(
-        validated_data["first_name"],
-        validated_data["last_name"],
-        validated_data["address"],
-        validated_data["state"],  
-        validated_data["city"],   
-        validated_data["zip_code"],
-        validated_data["phone_number"],
-        validated_data["mail"]
-    )
-
-    address_book.addContact(contact)
-    print("\nContact added successfully!")
-
-def edit_contact():
-    """ Edits an existing contact based on first name and last name. """
-    first_name = input("Enter First Name of the contact to edit: ").strip()
-    last_name = input("Enter Last Name of the contact to edit: ").strip()
+    print(f"\nEditing Contact: {contact}")
     
-    for phone, contact in address_book.contacts.items():
-        if contact.first_name.lower() == first_name.lower() and contact.last_name.lower() == last_name.lower():
-            print(f"\nFound Contact: {contact}")
+    updated_data = {
+        "first_name": contact.first_name,  # Keep original case
+        "last_name": contact.last_name,  # Keep original case
+        "address": input(f"Enter new Address (Leave blank to keep '{contact.address}'): ").strip() or contact.address,
+        "city": input(f"Enter new City (Leave blank to keep '{contact.city}'): ").strip() or contact.city,
+        "state": input(f"Enter new State (Leave blank to keep '{contact.state}'): ").strip() or contact.state,
+        "zip_code": input(f"Enter new ZIP Code (Leave blank to keep '{contact.zip_code}'): ").strip() or contact.zip_code,
+        "phone_number": input(f"Enter new Phone Number (Leave blank to keep '{contact.phone_number}'): ").strip() or contact.phone_number,
+        "email": input(f"Enter new Email (Leave blank to keep '{contact.email}'): ").strip() or contact.email
+    }
 
-            updated_data = {
-                "address": input(f"Enter new Address (Leave blank to keep '{contact.address}'): ").strip() or contact.address,
-                "city": input(f"Enter new City (Leave blank to keep '{contact.city}'): ").strip() or contact.city,
-                "state": input(f"Enter new State (Leave blank to keep '{contact.state}'): ").strip() or contact.state,
-                "zip_code": input(f"Enter new ZIP Code (Leave blank to keep '{contact.zip_code}'): ").strip() or contact.zip_code,
-                "phone_number": input(f"Enter new Phone Number (Leave blank to keep '{contact.phone_number}'): ").strip() or contact.phone_number,
-                "mail": input(f"Enter new Email (Leave blank to keep '{contact.mail}'): ").strip() or contact.mail
-            }
-
-            validated_data = validate_data(updated_data)
-            if any(value is False for value in validated_data.values()):
-                print("\nValidation failed! Edit operation canceled.")
-                return
-
-            contact.address = validated_data["address"]
-            contact.city = validated_data["city"]
-            contact.state = validated_data["state"]
-            contact.zip_code = validated_data["zip_code"]
-            contact.phone_number = validated_data["phone_number"]
-            contact.mail = validated_data["mail"]
-            
-            print("\nContact updated successfully!")
-            return
+    validated_data = validate_data(updated_data)
+    if not isinstance(validated_data, dict):  # Check if validation failed
+        print("\nValidation failed! Edit operation canceled.")
+        return
     
-    print("\nContact not found!")
+    contact.update(validated_data)  # Update contact details
+    print("\nContact updated successfully!")
 
-def delete_contact():
-    """ Deletes a contact using the first name and last name. """
-    first_name = input("Enter First Name of the contact to delete: ").strip()
-    last_name = input("Enter Last Name of the contact to delete: ").strip()
-
-    for phone, contact in list(address_book.contacts.items()):
-        if contact.first_name.lower() == first_name.lower() and contact.last_name.lower() == last_name.lower():
-            del address_book.contacts[phone]
-            print("\nContact deleted successfully!")
-            return
-    
-    print("\nContact not found!")
-
-if __name__ == "__main__":
-    print(f"\nWELCOME TO {address_book_name.upper()} ADDRESS BOOK\n")  
-    
+def manage_address_book():
+    """Handles address book operations."""
     while True:
-        print("\n1. Add Contact")
-        print("2. View Contacts")
-        print("3. Edit Contact")
-        print("4. Delete Contact")
+        print("\nAddress Book Menu")
+        print("1. Add Address Book")
+        print("2. Select Address Book")
+        print("3. Display Address Books")
+        print("4. Delete Address Book")
         print("5. Exit")
+
         choice = input("Choose an option: ").strip()
-        
+
         if choice == "1":
-            add_contact()
+            book_name = input("Enter Address Book Name: ").strip()
+            address_book_system.add_address_book(book_name)
+        
         elif choice == "2":
-            address_book.getContacts()
+            book_name = input("Enter Address Book Name to use: ").strip()
+            address_book = address_book_system.get_address_book(book_name)
+
+            if address_book is None:
+                print(" Address Book not found!")
+                continue
+            
+            while True:
+                print(f"\nManaging '{book_name}' Address Book")
+                print("1. Add Contact")
+                print("2. View Contacts")
+                print("3. Edit Contact")
+                print("4. Delete Contact")
+                print("5. Exit Address Book")
+
+                sub_choice = input("Choose an option: ").strip()
+
+                if sub_choice == "1":
+                    contact_data = get_contact_input()
+                    add_contact_to_book(address_book, contact_data)
+                
+                elif sub_choice == "2":
+                    address_book.view_contacts()
+
+                elif sub_choice == "3":
+                    edit_contact(address_book)
+
+                elif sub_choice == "4":
+                    first_name = input("Enter First Name of contact to delete: ").strip().lower()
+                    last_name = input("Enter Last Name of contact to delete: ").strip().lower()
+                    address_book.delete_contact(first_name, last_name)
+
+                elif sub_choice == "5":
+                    print(f" Exiting '{book_name}' Address Book.")
+                    break
+                
+                else:
+                    print(" Invalid choice, please select again.")
+
         elif choice == "3":
-            edit_contact()
+            address_book_system.display_address_books()
+
         elif choice == "4":
-            delete_contact()
+            book_name = input("Enter Address Book Name to delete: ").strip()
+            address_book_system.delete_address_book(book_name)
+
         elif choice == "5":
-            print(f"Exiting {address_book_name} Address Book. Goodbye!")
+            print(" Exiting Address Book System. Goodbye!")
             break
+
         else:
             print("Invalid choice, please select again.")
+
+if __name__ == "__main__":
+    manage_address_book()
