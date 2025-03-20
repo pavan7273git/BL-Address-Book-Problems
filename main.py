@@ -79,6 +79,29 @@ def edit_contact(address_book):
 #         for contact, book_name in contacts:
 #             print(f" - {contact.first_name} {contact.last_name} (Found in Address Book: {book_name})")
 
+def sort_contacts(address_book):
+    """Sorts and displays contacts alphabetically by first name."""
+    contacts = address_book.contacts  # Directly use the list
+
+    if not contacts:
+        print("\nNo contacts available to sort!")
+        return
+
+    # Sorting contacts by first name (case insensitive)
+    sorted_contacts = sorted(contacts, key=lambda c: c.first_name.lower())
+
+    print("\nSorted Contacts (Alphabetically by First Name):\n")
+    for contact in sorted_contacts:
+        print(f"First Name: {contact.first_name}")
+        print(f"Last Name: {contact.last_name}")
+        print(f"Address: {contact.address}")
+        print(f"City: {contact.city}")
+        print(f"State: {contact.state}")
+        print(f"Zip Code: {contact.zip_code}")
+        print(f"Phone Number: {contact.phone_number}")
+        print(f"Email: {contact.email}")
+        print("-" * 40)  
+
 
 def search_contact():
     """Searches for contacts by city or state and prints results with count."""
@@ -174,7 +197,8 @@ def manage_address_book():
                 print("2. View Contacts")
                 print("3. Edit Contact")
                 print("4. Delete Contact")
-                print("5. Exit Address Book")
+                print("5. Sort Contacts")  # New option for sorting
+                print("6. Exit Address Book")
 
                 sub_choice = input("Choose an option: ").strip()
 
@@ -193,7 +217,10 @@ def manage_address_book():
                     last_name = input("Enter Last Name of contact to delete: ").strip()
                     address_book.delete_contact(first_name, last_name)
 
-                elif sub_choice == "5":
+                elif sub_choice == "5":  # Sort contacts
+                    sort_contacts(address_book)
+
+                elif sub_choice == "6":
                     print(f"Exiting '{book_name}' Address Book")
                     break
                 
@@ -216,6 +243,8 @@ def manage_address_book():
 
         else:
             print("Invalid choice, please select again")
+
+
 
 if __name__ == "__main__":
     manage_address_book()
