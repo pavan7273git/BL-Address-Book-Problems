@@ -36,35 +36,29 @@ def get_contact_input():
     }
 
 def edit_contact(address_book):
-    """Edits an existing contact in the address book."""
-    first_name = input("Enter First Name of the contact to edit: ").strip().lower()
-    last_name = input("Enter Last Name of the contact to edit: ").strip().lower()
-    
-    contact = address_book.get_contact(first_name, last_name)
-    if not contact:
-        print("\n Contact not found!")
-        return
-    
-    print(f"\nEditing Contact: {contact}")
-    
-    updated_data = {
-        "first_name": contact.first_name,  # Keep original case
-        "last_name": contact.last_name,  # Keep original case
-        "address": input(f"Enter new Address (Leave blank to keep '{contact.address}'): ").strip() or contact.address,
-        "city": input(f"Enter new City (Leave blank to keep '{contact.city}'): ").strip() or contact.city,
-        "state": input(f"Enter new State (Leave blank to keep '{contact.state}'): ").strip() or contact.state,
-        "zip_code": input(f"Enter new ZIP Code (Leave blank to keep '{contact.zip_code}'): ").strip() or contact.zip_code,
-        "phone_number": input(f"Enter new Phone Number (Leave blank to keep '{contact.phone_number}'): ").strip() or contact.phone_number,
-        "email": input(f"Enter new Email (Leave blank to keep '{contact.email}'): ").strip() or contact.email
-    }
+    """Edits an existing contact in the address book and saves changes."""
+    first_name = input("Enter First Name of the contact to edit: ").strip()
+    last_name = input("Enter Last Name of the contact to edit: ").strip()
 
-    validated_data = validate_data(updated_data)
-    if not isinstance(validated_data, dict):  # Check if validation failed
-        print("\nValidation failed! Edit operation canceled.")
-        return
-    
-    contact.update(validated_data)  # Update contact details
-    print("\nContact updated successfully!")
+    contact = address_book.get_contact(first_name, last_name)
+
+    if contact:
+        print("\nEditing Contact (Press Enter to keep the existing value):")
+
+        contact.first_name = input(f"New First Name [{contact.first_name}]: ") or contact.first_name
+        contact.last_name = input(f"New Last Name [{contact.last_name}]: ") or contact.last_name
+        contact.address = input(f"New Address [{contact.address}]: ") or contact.address
+        contact.city = input(f"New City [{contact.city}]: ") or contact.city
+        contact.state = input(f"New State [{contact.state}]: ") or contact.state
+        contact.zip_code = input(f"New ZIP Code [{contact.zip_code}]: ") or contact.zip_code
+        contact.phone_number = input(f"New Phone Number [{contact.phone_number}]: ") or contact.phone_number
+        contact.email = input(f"New Email [{contact.email}]: ") or contact.email
+
+        address_book.save_contacts()  #  Saves updated data to CSV file
+        print(f"Contact '{first_name} {last_name}' updated successfully!")
+    else:
+        print(f"Contact '{first_name} {last_name}' not found!")
+
 
 
 
