@@ -1,38 +1,22 @@
 import os
-import csv
+import json
+from contact import Contact  
 
-# Define the CSV folder path
 DATA_FOLDER = "data"
-CSV_FOLDER = os.path.join(DATA_FOLDER, "csv")
-
-class Contact:
-    """Class representing a contact in the address book."""
-    def __init__(self, first_name, last_name, address, city, state, zip_code, phone_number, email):
-        self.first_name = first_name
-        self.last_name = last_name
-        self.address = address
-        self.city = city
-        self.state = state
-        self.zip_code = zip_code
-        self.phone_number = phone_number
-        self.email = email
-
-    def __str__(self):
-        return f"{self.first_name} {self.last_name}, {self.address}, {self.city}, {self.state}, {self.zip_code}, {self.phone_number}, {self.email}"
+JSON_FOLDER = os.path.join(DATA_FOLDER, "json")
 
 class AddressBook:
-    """Class representing an Address Book."""
     def __init__(self, name):
+        """Initialize AddressBook with a unique name and empty contact list."""
         self.name = name
         self.contacts = []
-        self.csv_file = os.path.join(CSV_FOLDER, f"{self.name}.csv")
-
-        self.load_contacts()  # Load contacts on initialization
+        self.json_file = os.path.join(JSON_FOLDER, f"{self.name}.json")
+        self.load_contacts()  # Load existing contacts if the file exists
 
     def add_contact(self, contact):
-        """Adds a new contact and saves it to CSV."""
+        """Adds a new contact to the address book."""
         self.contacts.append(contact)
-        self.save_contacts()  # Save contacts after adding
+        self.save_contacts()
 
     def is_duplicate(self, first_name, last_name):
         """Checks if a contact with the same name already exists."""
@@ -47,48 +31,48 @@ class AddressBook:
                 print(contact)
 
     def get_contact(self, first_name, last_name):
-        """Finds and returns a contact by first and last name (case insensitive)."""
-        first_name = first_name.strip().lower()
-        last_name = last_name.strip().lower()
+        """Finds and returns a contact by first and last name."""
         for contact in self.contacts:
-            if contact.first_name.lower() == first_name and contact.last_name.lower() == last_name:
+            if contact.first_name.lower() == first_name.lower() and contact.last_name.lower() == last_name.lower():
+
                 return contact
         return None
 
+    def edit_contact(self, first_name, last_name, updated_data):
+        """Edits an existing contact and saves changes."""
+        for contact in self.contacts:
+            if contact["first_name"].lower() == first_name.lower() and contact["last_name"].lower() == last_name.lower():
+                contact.update(updated_data)  # Update contact details
+                self.save_contacts()
+                print(f"Contact '{first_name} {last_name}' updated successfully!")
+                return
+        print("Contact not found!")
 
     def delete_contact(self, first_name, last_name):
-        """Deletes a contact and updates the CSV file."""
-        contact = self.get_contact(first_name, last_name)
-        if contact:
-            self.contacts.remove(contact)
-            self.save_contacts()  # Save after deletion
-            print(f" Contact '{first_name} {last_name}' deleted successfully!")
-        else:
-            print(f" Contact '{first_name} {last_name}' not found!")
+        """Deletes a contact from the address book."""
+        for contact in self.contacts:
+            if contact["first_name"].lower() == first_name.lower() and contact["last_name"].lower() == last_name.lower():
+                self.contacts.remove(contact)
+                self.save_contacts()
+                print(f"Contact '{first_name} {last_name}' deleted successfully!")
+                return
+        print("Contact not found!")
 
     def save_contacts(self):
-        """Saves all contacts to a CSV file."""
-        os.makedirs(CSV_FOLDER, exist_ok=True)  # Ensure the directory exists
-
-        with open(self.csv_file, mode="w", newline="") as file:
-            writer = csv.writer(file)
-            writer.writerow(["First Name", "Last Name", "Address", "City", "State", "ZIP", "Phone", "Email"])
-
-            for contact in self.contacts:
-                writer.writerow([
-                    contact.first_name, contact.last_name, contact.address,
-                    contact.city, contact.state, contact.zip_code,
-                    contact.phone_number, contact.email
-                ])
+        """Saves all contacts to a JSON file."""
+        os.makedirs(JSON_FOLDER, exist_ok=True)  # Ensure the directory exists
+        with open(self.json_file, "w") as file:
+            json.dump([contact.__dict__ for contact in self.contacts], file, indent=4)
 
     def load_contacts(self):
-        """Loads contacts from a CSV file if it exists."""
-        if os.path.exists(self.csv_file):
-            with open(self.csv_file, mode="r", newline="") as file:
-                reader = csv.reader(file)
-                next(reader, None)  # Skip the header row
+        """Loads contacts from a JSON file."""
+        if os.path.exists(self.json_file):
+            with open(self.json_file, mode="r") as file:
+                try:
+                    contacts_data = json.load(file)
+                    self.contacts = [Contact(**data) for data in contacts_data]  # Convert back to Contact objects
+                except json.JSONDecodeError:
+                    self.contacts = []
+        else:
+            self.contacts = []
 
-                for row in reader:
-                    if len(row) == 8:  # Ensure correct format
-                        contact = Contact(*row)
-                        self.contacts.append(contact)
